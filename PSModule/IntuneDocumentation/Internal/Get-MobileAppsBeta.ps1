@@ -1,4 +1,4 @@
-Function Get-MobileAppsBeta(){
+Function Get-MobileAppsBeta() {
     <#
     .SYNOPSIS
     This function is used to get the all mobile apps from the Beta Graph API REST interface
@@ -11,9 +11,10 @@ Function Get-MobileAppsBeta(){
     NAME: Get-MobileAppsBeta
     #>
     try {
-        $uri = "https://graph.microsoft.com/beta/deviceAppManagement/mobileApps"
+        $uri = "https://graph.microsoft.us/beta/deviceAppManagement/mobileApps"
         (Invoke-MSGraphRequest -Url $uri -HttpMethod GET).Value
-    } catch {
+    }
+    catch {
         $ex = $_.Exception
         $errorResponse = $ex.Response.GetResponseStream()
         $reader = New-Object System.IO.StreamReader($errorResponse)

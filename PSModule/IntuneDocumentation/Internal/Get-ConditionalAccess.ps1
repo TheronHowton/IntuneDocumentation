@@ -1,4 +1,4 @@
-Function Get-ConditionalAccess(){
+Function Get-ConditionalAccess() {
     <#
     .SYNOPSIS
     This function is used to get the Conditional Access from the Graph API REST interface
@@ -11,9 +11,10 @@ Function Get-ConditionalAccess(){
     NAME: Get-ConditionalAccess
     #>
     try {
-        $uri = "https://graph.microsoft.com/beta/identity/conditionalAccess/policies"
+        $uri = "https://graph.microsoft.us/beta/identity/conditionalAccess/policies"
         (Invoke-MSGraphRequest -Url $uri -HttpMethod GET).Value
-    } catch {
+    }
+    catch {
         $ex = $_.Exception
         $errorResponse = $ex.Response.GetResponseStream()
         $reader = New-Object System.IO.StreamReader($errorResponse)

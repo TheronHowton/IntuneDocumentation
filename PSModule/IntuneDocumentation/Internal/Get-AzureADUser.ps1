@@ -1,4 +1,4 @@
-Function Get-AzureADUser(){
+Function Get-AzureADUser() {
     <#
     .SYNOPSIS
     This function is used to get the AzureAD User Name by ID from the Graph API REST interface
@@ -11,18 +11,20 @@ Function Get-AzureADUser(){
     NAME: Get-AzureADUser
     #>
     param(
-            [String]
-            $UserId
-        )
+        [String]
+        $UserId
+    )
     try {
-        if($UserId -match("^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$")){
-            $uri = "https://graph.microsoft.com/beta/users/$UserId"
+        if ($UserId -match ("^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$")) {
+            $uri = "https://graph.microsoft.us/beta/users/$UserId"
             $user = (Invoke-MSGraphRequest -Url $uri -HttpMethod GET)
             "$($user.displayName)($($user.userPrincipalName))"
-        } else{
+        }
+        else {
             $UserId
         }
-    } catch {
+    }
+    catch {
         $ex = $_.Exception
         $errorResponse = $ex.Response.GetResponseStream()
         $reader = New-Object System.IO.StreamReader($errorResponse)

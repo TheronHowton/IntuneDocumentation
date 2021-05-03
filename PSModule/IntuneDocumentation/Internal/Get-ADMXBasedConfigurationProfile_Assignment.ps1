@@ -1,4 +1,4 @@
-Function Get-ADMXBasedConfigurationProfile_Assignment(){
+Function Get-ADMXBasedConfigurationProfile_Assignment() {
     <#
     .SYNOPSIS
     This function is used to get the ADMX Policy Assignments from the Graph API REST interface
@@ -14,9 +14,10 @@ Function Get-ADMXBasedConfigurationProfile_Assignment(){
         $ADMXBasedConfigurationProfileId
     )
     try {
-        $Policies = Invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/Beta/deviceManagement/groupPolicyConfigurations/$ADMXBasedConfigurationProfileId/assignments"
+        $Policies = Invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.us/Beta/deviceManagement/groupPolicyConfigurations/$ADMXBasedConfigurationProfileId/assignments"
         $Policies.Value
-    } catch {     
+    }
+    catch {     
         Write-Log "Response content:`n$responseBody" -Type Error
         Write-Log "Failed to get ADMX based Intune Policies." -Type Error -Exception $_.Exception
     }

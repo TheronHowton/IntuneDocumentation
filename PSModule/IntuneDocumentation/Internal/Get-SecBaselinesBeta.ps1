@@ -1,4 +1,4 @@
-Function Get-SecBaselinesBeta(){
+Function Get-SecBaselinesBeta() {
     <#
     .SYNOPSIS
     This function is used to get the all Security Baselines from the Beta Graph API REST interface
@@ -11,39 +11,41 @@ Function Get-SecBaselinesBeta(){
     NAME: Get-SecBaselinesBeta
     #>
     try {
-        $uri = "https://graph.microsoft.com/beta/deviceManagement/intents"
+        $uri = "https://graph.microsoft.us/beta/deviceManagement/intents"
         $templates = (Invoke-MSGraphRequest -Url $uri -HttpMethod GET).Value
         $returnTemplates = @()
-        foreach($template in $templates){
-            $settings = Invoke-MSGraphRequest -Url "https://graph.microsoft.com/beta/deviceManagement/intents/$($template.id)/settings"
-            $templateDetail = Invoke-MSGraphRequest -Url "https://graph.microsoft.com/beta/deviceManagement/templates/$($template.templateId)"
+        foreach ($template in $templates) {
+            $settings = Invoke-MSGraphRequest -Url "https://graph.microsoft.us/beta/deviceManagement/intents/$($template.id)/settings"
+            $templateDetail = Invoke-MSGraphRequest -Url "https://graph.microsoft.us/beta/deviceManagement/templates/$($template.templateId)"
             $returnTemplate = [PSCustomObject]@{ id = $template.id }
             $returnTemplate | Add-Member Noteproperty -Name Name -Value $template.displayName -Force
             $typeString = "$($templateDetail.platformType)-$($templateDetail.templateType)-$($templateDetail.templateSubtype)" 
             $returnTemplate | Add-Member Noteproperty -Name '@odata.type' -Value $typeString -Force 
 
             $TempSettings = @()
-            foreach($setting in $settings.value){
+            foreach ($setting in $settings.value) {
                 # $settingDef = Invoke-MSGraphRequest -Url "https://graph.microsoft.com/beta/deviceManagement/settingDefinitions/$($setting.id)" -ErrorAction SilentlyContinue
                 # $displayName = $settingDef.Value.displayName 
                 # if($null -eq $displayName){
-                $displayName = $setting.definitionId -replace "deviceConfiguration--","" -replace "admx--",""  -replace "_"," "
+                $displayName = $setting.definitionId -replace "deviceConfiguration--", "" -replace "admx--", "" -replace "_", " "
                 # }
-                if($null -eq $setting.value){
+                if ($null -eq $setting.value) {
 
-                    if($setting.definitionId -eq "deviceConfiguration--windows10EndpointProtectionConfiguration_firewallRules"){
+                    if ($setting.definitionId -eq "deviceConfiguration--windows10EndpointProtectionConfiguration_firewallRules") {
                         $v = $setting.valueJson | ConvertFrom-Json
-                        foreach($item in $v){
+                        foreach ($item in $v) {
                             $TempSetting = [PSCustomObject]@{ Name = "FW Rule - $($item.displayName)"; Value = ($item | ConvertTo-Json) }
                             $TempSettings += $TempSetting
                         }
-                    } else {
+                    }
+                    else {
                         
                         $v = ""
                         $TempSetting = [PSCustomObject]@{ Name = $displayName; Value = $v }
                         $TempSettings += $TempSetting
                     }
-                } else {
+                }
+                else {
                     $v = $setting.value
                     $TempSetting = [PSCustomObject]@{ Name = $displayName; Value = $v }
                     $TempSettings += $TempSetting
@@ -51,13 +53,14 @@ Function Get-SecBaselinesBeta(){
                 
             }
             $returnTemplate | Add-Member Noteproperty -Name Settings -Value $TempSettings -Force
-            $assignments = Invoke-MSGraphRequest -Url "https://graph.microsoft.com/beta/deviceManagement/intents/$($template.id)/assignments"
+            $assignments = Invoke-MSGraphRequest -Url "https://graph.microsoft.us/beta/deviceManagement/intents/$($template.id)/assignments"
             $returnTemplate | Add-Member Noteproperty -Name Assignments -Value $assignments.Value -Force
             $returnTemplates += $returnTemplate
         }
         $returnTemplates
 
-    } catch {
+    }
+    catch {
         $ex = $_.Exception
         $errorResponse = $ex.Response.GetResponseStream()
         $reader = New-Object System.IO.StreamReader($errorResponse)

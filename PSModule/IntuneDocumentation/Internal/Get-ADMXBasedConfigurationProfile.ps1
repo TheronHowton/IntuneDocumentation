@@ -1,4 +1,4 @@
-Function Get-ADMXBasedConfigurationProfile(){
+Function Get-ADMXBasedConfigurationProfile() {
     <#
     .SYNOPSIS
     This function is used to get the ADMX Policies from the Graph API REST interface
@@ -12,41 +12,44 @@ Function Get-ADMXBasedConfigurationProfile(){
     #>
     try {
 
-        $Policies = Invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/Beta/deviceManagement/groupPolicyConfigurations"
+        $Policies = Invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.us/Beta/deviceManagement/groupPolicyConfigurations"
         $return = @()
-        foreach($Policy in $Policies.value){
+        foreach ($Policy in $Policies.value) {
             $return2 = @()
-            $values = Invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/Beta/deviceManagement/groupPolicyConfigurations/$($Policy.Id)/definitionValues"
-            foreach($value in $values.value){
-                try{
-                    $definition = (Invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/Beta/deviceManagement/groupPolicyConfigurations/$($Policy.Id)/definitionValues/$($value.id)/definition")
-                    $res = Invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.com/Beta/deviceManagement/groupPolicyConfigurations/$($Policy.Id)/definitionValues/$($value.id)/presentationValues"
-                    if($null -ne $res.value.Value){
-                        $AdditionalConfig = if($res.value.value.GetType().baseType.Name -eq "Array"){ $res.value.value -join ", "  } else { $res.value.value }
-                    } else {
+            $values = Invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.us/Beta/deviceManagement/groupPolicyConfigurations/$($Policy.Id)/definitionValues"
+            foreach ($value in $values.value) {
+                try {
+                    $definition = (Invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.us/Beta/deviceManagement/groupPolicyConfigurations/$($Policy.Id)/definitionValues/$($value.id)/definition")
+                    $res = Invoke-MSGraphRequest -HttpMethod GET -Url "https://graph.microsoft.us/Beta/deviceManagement/groupPolicyConfigurations/$($Policy.Id)/definitionValues/$($value.id)/presentationValues"
+                    if ($null -ne $res.value.Value) {
+                        $AdditionalConfig = if ($res.value.value.GetType().baseType.Name -eq "Array") { $res.value.value -join ", " } else { $res.value.value }
+                    }
+                    else {
                         $AdditionalConfig = ""
                     }
                     $return2 += [PSCustomObject]@{ 
                         DisplayName = $definition.displayName
                         #ExplainText = $definition.explainText
-                        Scope = $definition.classType
-                        Path = $definition.categoryPath
+                        Scope       = $definition.classType
+                        Path        = $definition.categoryPath
                         SupportedOn = $definition.supportedOn
-                        State = if($value.enabled -eq $true){"Enabled"} else {"Disabled"}
-                        Value = $AdditionalConfig
+                        State       = if ($value.enabled -eq $true) { "Enabled" } else { "Disabled" }
+                        Value       = $AdditionalConfig
                     }
-                } catch {
+                }
+                catch {
                     Write-Log -Message "Error reading ADMX setting" -Type Warn -Exception $_.Exception
                 }
             }
             $return += [PSCustomObject]@{ 
                 DisplayName = $Policy.displayName
-                Id = $Policy.id
-                Settings = $return2
+                Id          = $Policy.id
+                Settings    = $return2
             }
         }
         return $return
-    } catch {     
+    }
+    catch {     
         Write-Log "Response content:`n$responseBody" -Type Error
         Write-Log "Failed to get ADMX based Intune Policies." -Type Error -Exception $_.Exception
     }

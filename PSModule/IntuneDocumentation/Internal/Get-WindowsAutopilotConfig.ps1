@@ -1,4 +1,4 @@
-Function Get-WindowsAutopilotConfig(){
+Function Get-WindowsAutopilotConfig() {
     <#
     .SYNOPSIS
     This function is used to get the AutoPilot configuration from the Graph API REST interface
@@ -11,9 +11,10 @@ Function Get-WindowsAutopilotConfig(){
     NAME: Get-WindowsAutopilotConfig
     #>
     try {
-        $uri = "https://graph.microsoft.com/Beta/deviceManagement/windowsAutopilotDeploymentProfiles"
+        $uri = "https://graph.microsoft.us/Beta/deviceManagement/windowsAutopilotDeploymentProfiles"
         (Invoke-MSGraphRequest -Url $uri -HttpMethod GET).Value
-    } catch {
+    }
+    catch {
         $ex = $_.Exception
         $errorResponse = $ex.Response.GetResponseStream()
         $reader = New-Object System.IO.StreamReader($errorResponse)

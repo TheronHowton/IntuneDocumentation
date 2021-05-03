@@ -1,4 +1,4 @@
-Function Get-AzureADRole(){
+Function Get-AzureADRole() {
     <#
     .SYNOPSIS
     This function is used to get the AzureAD Role Name by ID from the Graph API REST interface
@@ -11,17 +11,19 @@ Function Get-AzureADRole(){
     NAME: Get-AzureADRole
     #>
     param(
-            [String]
-            $RoleId
-        )
+        [String]
+        $RoleId
+    )
     try {
-        if($RoleId -match("^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$")){
-            $uri = "https://graph.microsoft.com/beta/directoryRoleTemplates/$RoleId"
+        if ($RoleId -match ("^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$")) {
+            $uri = "https://graph.microsoft.us/beta/directoryRoleTemplates/$RoleId"
             (Invoke-MSGraphRequest -Url $uri -HttpMethod GET).displayName
-        } else {
+        }
+        else {
             $RoleId
         }
-    } catch {
+    }
+    catch {
         $ex = $_.Exception
         $errorResponse = $ex.Response.GetResponseStream()
         $reader = New-Object System.IO.StreamReader($errorResponse)
